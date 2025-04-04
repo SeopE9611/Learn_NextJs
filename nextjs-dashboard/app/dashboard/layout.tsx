@@ -1,5 +1,5 @@
 import SideNav from "@/app/ui/dashboard/sidenav";
-export const experimental_ppr = 'true' // 부분 사전 렌더링 구현에 따른 세그먼트 구성 옵션 추가
+// export const experimental_ppr = 'true' // 부분 사전 렌더링 구현에 따른 세그먼트 구성 옵션 추가
 export default function Layout({children} : {children: React.ReactNode}) {
  return (
   <div className="flex h-screen flex-col md:flex-row md: overflow-hidden">
