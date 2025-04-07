@@ -11,6 +11,8 @@ export default async function InvoicesTable({
   query: string;
   currentPage: number;
 }) {
+  // fetchFilteredInvoices 함수는 query와 currentPage를 기반으로
+  // 데이터베이스나 API에서 송장 데이터를 가져오는 역할을 함
   const invoices = await fetchFilteredInvoices(query, currentPage);
 
   return (
