@@ -34,6 +34,8 @@ export default function Search({ placeholder }: { placeholder: string }) {
         onChange={(e) => {
           handleSearch(e.target.value);
         }}
+        // ● URL의 쿼리 파라미터에서 검색어를 가져와서, 이를 입력 필드의 기본값으로 사용하는 것
+        defaultValue={searchParams.get('query')?.toString()} // ● 사용자가 링크를 공유하거나 페이지를 새로고침해도 입력창에 이전 검색어가 그대로 표시함
       />
       <MagnifyingGlassIcon className="absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500 peer-focus:text-gray-900" />
     </div>
