@@ -9,7 +9,7 @@ export default function Search({ placeholder }: { placeholder: string }) {
   const {replace} = useRouter(); // ○ useRouter의 replace 메소드 사용하여 URL을 변경함
 
   function handleSearch(term: string) {
-    // console.log(term);
+    console.log(`검색중... ${term}`);
     const params = new URLSearchParams(searchParams); // ☆ URLSearchParams API를 사용하여 쿼리파라미터들을 조작
     if(term) { // ☆ 만약 입력값이 있다면 
       params.set('query', term); //☆ quer라는 파라미터에 그 값을 세팅하고 
