@@ -5,6 +5,7 @@ import { CreateInvoice } from '@/app/ui/invoices/buttons';
 import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
+import { fetchInvoicesPages } from '@/app/lib/data';
  
 export default async function Page(props: {
   // 아래 코드의 선언부는 Next.js의 서버 컴포넌트에서 사용하는 패턴 중 하나
@@ -25,6 +26,9 @@ export default async function Page(props: {
   const query = searchParams?.query || ''; 
   // URL에 page 파라미터가 없다면 기본 페이지 번호를 1로 사용
   const currentPage = Number(searchParams?.page) || 1; 
+  
+  // 검색 조건에 따른 총 페이지 수를 계산하여 totalPages를 얻음
+  const totalPages = await fetchInvoicesPages(query); 
   return (
     <div className="w-full">
       <div className="flex w-full items-center justify-between">
@@ -36,12 +40,13 @@ export default async function Page(props: {
       </div>
       {/* Suspense 컴포넌트를 사용하여 데이터 로딩 시 스켈레톤 UI를 보여줌 */}
       {/* key를 query와 currentPage로 설정하여 이 값들이 변경되면 Suspensr가 다시 랜더링됨*/}
-       <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
+      <Suspense key={query + currentPage} fallback={<InvoicesTableSkeleton />}>
        {/* Table 컴포넌트에 현재 검색어(query)와 페이지 번호 (currentPage)를 전달 */}
         <Table query={query} currentPage={currentPage} />
       </Suspense>
       <div className="mt-5 flex w-full justify-center">
-        {/* <Pagination totalPages={totalPages} /> */}
+        {/* 총 페이지 수를 Pagination 컴포넌트에 전달 */}
+        <Pagination totalPages={totalPages} /> 
       </div>
     </div>
   );
