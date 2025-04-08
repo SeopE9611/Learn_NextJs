@@ -8,5 +8,8 @@ export async function createInvoice(formData: FormData){
     amount: formData.get('amount'),
     status: formData.get('status'),
   };
-  console.log(rawFormData); 
+  // 콘솔 출력 결과, 전부 string으로 나옴 - 타입 변환 해줘야함 (zod 라이브러리 사용하기)
+  console.log(typeof rawFormData.customerId); 
+  console.log(typeof rawFormData.amount); 
+  console.log(typeof rawFormData.status); 
 }
