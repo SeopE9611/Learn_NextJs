@@ -4,11 +4,21 @@ import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { generatePagination } from '@/app/lib/utils';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 export default function Pagination({ totalPages }: { totalPages: number }) {
   // NOTE: Uncomment this code in Chapter 11
-
+  const pathname = usePathname(); // 현재의 URL 경로 (ex: /dashboard/invoices)를 반환함
+  const searchParams = useSearchParams(); // 현재 URL의 검색 파라미터에 접근
+  const currentPage = Number(searchParams.get('page')) || 1; // 현재 페이지는 URL의 page 파라미터를 숫자로 변환함 값이며 값이 없으면 기본값 1로 설정
   // const allPages = generatePagination(currentPage, totalPages);
+
+  // 특정 페이지 번호를 받아 URL의 'page' 파라미터를 업데이트 하여 전체 URL을 반환하는 함수
+  const createPageURL = (pageNumber: number | string) => { // 페이지 번호를 기반으로 URL을 생성하는 함수
+    const params = new URLSearchParams(searchParams); // URLSearchParams 객체를 사용하여 검색 파라미터를 조작함
+    params.set('page', pageNumber.toString()); // page 파라미터를 설정함
+    return `${pathname}?${params.toString()}`; // 현재 경로와 검색 파라미터를 조합하여 URL을 반환함
+  };
 
   return (
     <>
