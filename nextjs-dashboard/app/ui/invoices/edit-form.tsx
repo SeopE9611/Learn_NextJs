@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import { Button } from '@/app/ui/button';
+import { updateInvoice } from '@/app/lib/actions';
 
 export default function EditInvoiceForm({
   invoice,
@@ -17,8 +18,11 @@ export default function EditInvoiceForm({
   invoice: InvoiceForm;
   customers: CustomerField[];
 }) {
+// updateInvoice 함수에 invoice.id를 바인딩하여 고정된 id로 업데이트하는 새로운 함수를 생성함. 이로 인해 updateInvoice 함수는 invoice.id를 첫 번째 인자로 자동으로 받게 됨. 즉, updateInvoice 함수는 invoice.id를 첫 번째 인자로 받고 나머지 인자는 FormData 객체로 받음. 이로 인해 updateInvoice 함수는 invoice.id를 사용하여 특정 송장을 업데이트할 수 있게 됨.
+  const UpdateInvoiceWithId = updateInvoice.bind(null, invoice.id) 
+
   return (
-    <form>
+    <form action={UpdateInvoiceWithId}>
       <div className="rounded-md bg-gray-50 p-4 md:p-6">
         {/* Customer Name */}
         <div className="mb-4">

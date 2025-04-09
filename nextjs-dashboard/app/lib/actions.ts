@@ -45,3 +45,31 @@ revalidatePath('/dashboard/invoices') // 송장 페이지를 재검증하여 최
 // redirect 함수는 캐시가 재검증된 후 사용자가 자동으로 /dashboard/invoices 페이지로 이동하게 하여 새로 생성된 인보이스가 목록 상단에 보이도록 하는 역할을 담당함
 redirect('/dashboard/invoices') // 업데이트 후 사용자 송장 목록 페이지로 리다이렉트
 }
+
+// UpdateInvoice 함수는 송장을 업데이트하기위한 스키마를 정의함 (createInvoice와 비슷함)
+const UpdateInvoice = FromSchema.omit({id:true, date:true}); 
+
+// updateInvoice server Action : 첫번째 인자로 invoice id, 두번째로 폼데이터 받음
+// 이말은 즉, updateInvoice 함수는 송장 id를 첫 번째 인자로 받고 나머지 인자는 FormData 객체로 받음.
+// 이로 인해 updateInvoice 함수는 invoice.id를 사용하여 특정 송장을 업데이트 할 수 있게 됨
+export async function updateInvoice(id:string, formData:FormData) {
+ // 폼 데이터 추출 및 검증
+ const {customerId, amount, status} = UpdateInvoice.parse({
+  customerId: formData.get('customerId'),
+  amount: formData.get('amount'),
+  status: formData.get('status'),
+ });
+ 
+ // 금액을 센트 단위로 변환
+ const amountInCents = amount * 100;
+
+ await sql`
+  UPDATE invoices --SQL 쿼리문
+  SET customer_id = ${customerId}, amount = ${amountInCents}, status = ${status} -- 업데이트할 필드들
+  WHERE id = ${id} -- 업데이트할 송장 id
+ `
+
+ // 캐시 재검증과 리다이렉트 처리
+ revalidatePath('/dashboard/invoices') // 송장 페이지를 재검증하여 최신 상태로 업데이트
+ redirect('/dashboard/invoices') // 업데이트 후 사용자 송장 목록 페이지로 리다이렉트
+}
