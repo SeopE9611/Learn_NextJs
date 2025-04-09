@@ -1,5 +1,7 @@
 'use server' // use server 선언을 통해 이 파일에 있는 함수들은 서버 전용 함수임이 명시.
 
+import { revalidatePath } from 'next/cache';
+import { redirect } from 'next/navigation';
 import postgres from 'postgres';
 import {z} from 'zod'; // zod 라이브러리
 
@@ -36,5 +38,10 @@ export async function createInvoice(formData: FormData){
   await sql`
   INSERT INTO invoices (customer_id, amount, status, date)
   VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
-`
+`;
+// revalidatePath 함수는 사용자의 브라우저에 캐시된 페이지를 무효화하고 서버에서 최신 데이터를 가져와서 페이지를 다시 렌더링함
+revalidatePath('/dashboard/invoices') // 송장 페이지를 재검증하여 최신 상태로 업데이트
+
+// redirect 함수는 캐시가 재검증된 후 사용자가 자동으로 /dashboard/invoices 페이지로 이동하게 하여 새로 생성된 인보이스가 목록 상단에 보이도록 하는 역할을 담당함
+redirect('/dashboard/invoices') // 업데이트 후 사용자 송장 목록 페이지로 리다이렉트
 }
