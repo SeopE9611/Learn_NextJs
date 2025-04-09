@@ -1,6 +1,10 @@
 'use server' // use server 선언을 통해 이 파일에 있는 함수들은 서버 전용 함수임이 명시.
 
+import postgres from 'postgres';
 import {z} from 'zod'; // zod 라이브러리
+
+const sql = postgres(process.env.POSTGRES_URL!,{ssl:'require'}) // postgres 라이브러리를 사용하여 데이터베이스 URL과 SSL 옵션을 사용하여 연결을 초기화함
+
 const FromSchema = z.object({
   id: z.string(), 
   customerId: z.string(),
@@ -26,4 +30,11 @@ export async function createInvoice(formData: FormData){
   // console.log(typeof rawFormData.customerId); 
   // console.log(typeof rawFormData.amount); 
   // console.log(typeof rawFormData.status); 
+
+  // SQL 쿼리를 사용하여 새로운 인보이스를 데이터 베이스에 삽입
+  // 템플릿 리터럴 안에 변수들을 안전하게 삽입함으로써 SQL 인젝션 공격을 예방할 수 있음
+  await sql`
+  INSERT INTO invoices (customer_id, amount, status, date)
+  VALUES (${customerId}, ${amountInCents}, ${status}, ${date})
+`
 }
