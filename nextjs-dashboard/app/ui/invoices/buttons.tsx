@@ -1,5 +1,6 @@
 import { PencilIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
+import {deleteInvoice} from '@/app/lib/actions'
 
 export function CreateInvoice() {
   return (
@@ -25,12 +26,17 @@ export function UpdateInvoice({ id }: { id: string }) {
 }
 
 export function DeleteInvoice({ id }: { id: string }) {
+  // bind 메소드를 사용하여 deleteInvoiceWithId 함수를 생성하고 id를 고정함.
+  // 여기서 null은 this를 의미하며, deleteInvoice는 this가 필요없는 함수이므로 null을 전달함
+  // 여기서 this는 DeleteInvoice 함수와 관련된 객체를 의미함
+  const deleteInvoiceWithId = deleteInvoice.bind(null, id); 
   return (
-    <>
+    // 폼이 제출될 떄 deleteInvoiceWithId 함수가 호출됨
+    <form action={deleteInvoiceWithId}>
       <button type="submit" className="rounded-md border p-2 hover:bg-gray-100">
         <span className="sr-only">Delete</span>
         <TrashIcon className="w-5" />
       </button>
-    </>
+    </form>
   );
 }

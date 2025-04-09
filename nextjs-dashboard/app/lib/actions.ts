@@ -73,3 +73,13 @@ export async function updateInvoice(id:string, formData:FormData) {
  revalidatePath('/dashboard/invoices') // 송장 페이지를 재검증하여 최신 상태로 업데이트
  redirect('/dashboard/invoices') // 업데이트 후 사용자 송장 목록 페이지로 리다이렉트
 }
+
+export async function deleteInvoice(id:string) {
+  await sql`
+  -- 전달 받은 id를 사용하여 SQL DELETE 쿼리를 실행
+    DELETE FROM invoices -- 삭제할 송장 테이블
+    WHERE id = ${id} -- 삭제할 송장 id
+  `
+
+  revalidatePath('/dashboard/invoices') // 삭제 후, 송장 페이지를 재검증하여 최신 데이터를 반영
+}
