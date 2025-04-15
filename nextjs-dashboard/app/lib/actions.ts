@@ -85,7 +85,7 @@ export async function updateInvoice(id: string, formData: FormData) {
 }
 
 export async function deleteInvoice(id: string) {
-  throw new Error('송장 삭제에 실패했습니다.');
+  // throw new Error('송장 삭제에 실패했습니다.');
 
   await sql`
   -- 전달 받은 id를 사용하여 SQL DELETE 쿼리를 실행
