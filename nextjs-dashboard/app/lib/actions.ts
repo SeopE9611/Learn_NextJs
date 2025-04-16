@@ -9,24 +9,51 @@ const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' }); // postgres
 
 const FromSchema = z.object({
   id: z.string(),
-  customerId: z.string(),
-  amount: z.coerce.number(), // coerce는 string을 number로 변환해줌
-  status: z.enum(['pending', 'paid']), // enum은 특정 값만 허용하는 타입을 정의할 수 있음 - 상태: pending 또는 paid만 허용
+  customerId: z.string({
+    invalid_type_error: '소비자를 선택하세요' // (14장 ▶) 유효하지 않은 타입일 경우 오류 메시지 출력
+  }),
+  amount: z.coerce
+  .number() // coerce는 string을 number로 변환해줌
+  .gt(0, { message: '금액은 0보다 커야 합니다'}), // ▶ .gt는 greater than의 약자로, 0보다 큰 값만 허용하도록 설정함
+  status: z.enum(['pending', 'paid'], { // enum은 특정 값만 허용하는 타입을 정의할 수 있음 - 상태: pending 또는 paid만 허용
+    invalid_type_error: '송장 상태를 선택하세요', // ▶ 유효하지 않은 타입일 경우 오류 메시지 출력
+  }),
   date: z.string(),
 });
+
+export type State = { // ▶ State 타입 정의
+  errors?: { //▶ errors는 선택적 필드로, 오류 메시지를 담을 수 있음
+    customerId?: string[]; //▶ 고객 ID에 대한 오류 메시지 (string 배열)
+    amount?: string[]; //▶ 금액에 대한 오류 메시지 (string 배열)
+    status?: string[]; //▶ 상태에 대한 오류 메시지 (string 배열)
+  }; //▶ 각 필드가 string 배열을 선언된 이유는 한 필드에 여러 개의 오류 메시지를 동시에 담을 수 있기 때문
+  message?: string | null; //▶ 폼 제출 결과에 따라 성공 또는 오류 메시지를 단일 문자열로 저장하도록 함. 그리고 값이 없을 경우를 대비해서 null도 허용하는 선택적 타입
+}
 
 // 저장할 인보이스 데이터는 id와 date가 없으므로 omit을 사용하여 새로운 스키마를 만듬
 const CreateInvoice = FromSchema.omit({ id: true, date: true }); // omit은 id와 date 필드를 제외한 나머지 필드들로 새로운 스키마를 만듬
 
-export async function createInvoice(formData: FormData) {
+export async function createInvoice(prevState: State, formData: FormData) { //▶ prevState는 이전 상태를 나타내며, formData는 사용자가 제출한 폼 데이터를 나타냄 , 인자 순서에 대해서는 일반적으로 이전 상태를 먼저 받고 그 다음에 새로운 데이터가 오는 패턴이 일반적임
   // FormData 객체에서 필요한 필드의 값을 추출해서 객체로 만듬
   // 여기서 .get('필드이름') 메소드를 사용하여 각 데이터를 개별적으로 가져옴
-  const { customerId, amount, status } = CreateInvoice.parse({
+  // const { customerId, amount, status } = CreateInvoice.parse({
     // FormData에서 필드값을 추출하고 스키마로 검증(타입 변환 포함) 함
+
+    const validatedFields = CreateInvoice.safeParse({ // ▶ safeParse는 검증을 수행하고 결과를 반환함
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
   });
+
+  if (!validatedFields.success) { // ▶ 검증에 실패한 경우
+    return {
+      errors: validatedFields.error.flatten().fieldErrors, //▶ 검증 오류를 평탄화하여 errors 객체에 저장함 
+      message: '폼 검증에 실패했습니다' //▶ 오류 메시지 저장
+    }
+  }
+
+  const { customerId, amount, status} = validatedFields.data; //▶ 검증에 성공한 경우, validatedFields.data를 사용하여 각 필드의 값을 추출함
+
   const amountInCents = amount * 100; // 금액을 센트 단위로 변환 (ex: $20.50-> 2050 센트)
   const date = new Date().toISOString().split('T')[0]; // 현재 날짜를 ISO 형식(YYYY-MM-DD)로 변환
   // 콘솔 출력 결과, 전부 string으로 나옴 - 타입 변환 해줘야함 (zod 라이브러리 사용하기)
