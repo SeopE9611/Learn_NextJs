@@ -45,7 +45,7 @@ export default function Form({ customers }: { customers: CustomerField[] }) {
             <UserCircleIcon className="pointer-events-none absolute left-3 top-1/2 h-[18px] w-[18px] -translate-y-1/2 text-gray-500" />
           </div>
           
-          <div id = 'customer-error' aria-live='polite' aria-atomic='true'>  {/* ▶ 고객 선택 오류 메시지, aria-live는 스크린 리더에게 이 영역이 동적으로 업데이트 됨을 알림, aria-atomic은 이 영역의 모든 내용이 변경될 떄 스크린 리더가 읽도록 함 */}
+          <div id = 'customer-error' aria-live='polite' aria-atomic='true'>  {/* ▶ 고객 선택 오류 메시지, aria-live는 스크린 리더에게 이 영역이 동적으로 업데이트 됨을 알림, aria-atomic은 이 영역의 내용 전체가 하나의 단위로 취급되어 일부가 변경되어도 전체 내용이 다시 스크린 리더가 읽도록 함 */}
             {state.errors?.customerId && // ▶ 고객 선택 오류 메시지가 있을 경우에만 표시
               state.errors.customerId.map((error: string)=> ( // ▶ errors.customerId는 string 배열이므로 map을 사용하여 각 오류 메시지를 반복함 (map은 배열을 순회하면서 각 요소에 대해 함수를 실행하고 새로운 배열을 반환함) 
                 <p className='mt-2 text-sm text-red-500' key={error}> {/* ▶ key 값에 error를 사용하여 각 오류 메시지에 고유한 키를 부여함 */}
