@@ -28,6 +28,11 @@ export type State = { // ▶ State 타입 정의
     status?: string[]; //▶ 상태에 대한 오류 메시지 (string 배열)
   }; //▶ 각 필드가 string 배열을 선언된 이유는 한 필드에 여러 개의 오류 메시지를 동시에 담을 수 있기 때문
   message?: string | null; //▶ 폼 제출 결과에 따라 성공 또는 오류 메시지를 단일 문자열로 저장하도록 함. 그리고 값이 없을 경우를 대비해서 null도 허용하는 선택적 타입
+  values?: { // (번외) values는 사용자가 입력한 값을 저장하기 위한 객체로, 검증에 실패한 경우에도 사용자가 입력한 값을 유지하기 위해 사용됨
+    customerId?: string;
+    amount?: string;
+    status?: string;
+  }
 }
 
 // 저장할 인보이스 데이터는 id와 date가 없으므로 omit을 사용하여 새로운 스키마를 만듬
@@ -48,7 +53,12 @@ export async function createInvoice(prevState: State, formData: FormData) { //�
   if (!validatedFields.success) { // ▶ 검증에 실패한 경우
     return {
       errors: validatedFields.error.flatten().fieldErrors, //▶ 검증 오류를 평탄화하여 errors 객체에 저장함 
-      message: '폼 검증에 실패했습니다' //▶ 오류 메시지 저장
+      message: '폼 검증에 실패했습니다', //▶ 오류 메시지 저장
+      values: { // (번외) 검증에 실패한 경우에도 사용자가 입력한 값을 유지하기 위한 values 객체를 만듬
+        customerId: formData.get('customerId') as string,  //(번외) as string은 타입 단언으로, formData.get('customerId')의 반환값이 string임을 보장함
+        amount: formData.get('amount') as string,
+        status: formData.get('status') as string,
+      }
     }
   }
 
