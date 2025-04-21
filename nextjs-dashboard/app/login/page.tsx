@@ -16,6 +16,11 @@ export default function LoginPage() {
           </div>
         </div>
         {/* 5) LoginForm은 URL 파라메터(callbackUrl)를 참조하므로 Suspense로 감싸서 '서버 액션 준비' 대기 */}
+        {/* Suspense란 서버 컴포넌트에서 비동기 작업을 처리하는 방법으로, 서버 액션을 준비하는 동안 로딩 상태를 표시함
+        ※서버 컴포넌트의 의미는 서버에서 렌더링된 HTML을 클라이언트에 전달하는 것을 의미함 
+        ※ 서버 액션이란 서버에서 실행되는 함수로, 클라이언트에서 호출할 수 있음  */}
+        {/* Suspense는 서버 컴포넌트에서만 사용 가능 */}
+        {/* Login폼은 서버 액션을 사용하므로 Suspense로 감싸야 함 */}
         <Suspense>
           <LoginForm />
         </Suspense>
