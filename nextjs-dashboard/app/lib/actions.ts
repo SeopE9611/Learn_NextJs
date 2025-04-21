@@ -95,14 +95,33 @@ const UpdateInvoice = FromSchema.omit({ id: true, date: true });
 // updateInvoice server Action : 첫번째 인자로 invoice id, 두번째로 폼데이터 받음
 // 이말은 즉, updateInvoice 함수는 송장 id를 첫 번째 인자로 받고 나머지 인자는 FormData 객체로 받음.
 // 이로 인해 updateInvoice 함수는 invoice.id를 사용하여 특정 송장을 업데이트 할 수 있게 됨
-export async function updateInvoice(id: string, formData: FormData) {
-  // 폼 데이터 추출 및 검증
-  const { customerId, amount, status } = UpdateInvoice.parse({
+export async function updateInvoice(id: string, prevState: State, formData: FormData) { // updateInvoice에도 prevState추가
+  // // 폼 데이터 추출 및 검증
+  // const { customerId, amount, status } = UpdateInvoice.parse({
+  //   customerId: formData.get('customerId'),
+  //   amount: formData.get('amount'),
+  //   status: formData.get('status'),
+  // });
+
+  const validated = UpdateInvoice.safeParse({
     customerId: formData.get('customerId'),
     amount: formData.get('amount'),
     status: formData.get('status'),
-  });
+  })
 
+  if(!validated.success) {
+    return {
+      errors: validated.error.flatten().fieldErrors,
+      message: '폼 검증에 실패했습니다.',
+      values: {
+        customerId:formData.get('customerId') as string,
+        amount: formData.get('amount') as string,
+        status: formData.get('status') as string,
+      }
+    }
+  }
+
+  const {customerId, amount, status} = validated.data;
   // 금액을 센트 단위로 변환
   const amountInCents = amount * 100;
 
