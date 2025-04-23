@@ -1,5 +1,7 @@
 'use server'; // use server 선언을 통해 이 파일에 있는 함수들은 서버 전용 함수임이 명시.
 
+import { signIn } from '@/auth';
+import { AuthError } from 'next-auth';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import postgres from 'postgres';
@@ -150,4 +152,24 @@ export async function deleteInvoice(id: string) {
   `;
 
   revalidatePath('/dashboard/invoices'); // 삭제 후, 송장 페이지를 재검증하여 최신 데이터를 반영
+}
+
+export async function authenticate(
+  prevState: string | undefined, // useActionState 훅이 넘거주는 이전 에러 메시지, 이전 시도에서 발생한 에러를 확인하거나 덮어쓸 때 사용가능
+  formData: FormData, // 클라이언트에서 전송된 폼 데이터. formData.get('email), ('password')등으로 필드에 접근할 수 있다.
+) {
+  try {
+  await signIn('credentials', formData); // 로그인 성공 시 별도 반환값이 없으므로 undefined(void) 반환
+  } catch (error) {
+    if(error instanceof AuthError) {
+      // NextAuth에서 던지는 인증 오류 타입별로 메시지 분기
+      switch(error.type) {
+        case 'CredentialsSignin':
+          return '잘못된 이메일 또는 비밀번호 입니다.'; // 이메일, 비번 불일치
+        default:
+          return '알 수 없는 오류가 발생했습니다.'
+      }
+    }
+    throw error;
+  }
 }
