@@ -6,7 +6,13 @@ import { lusitana } from '@/app/ui/fonts';
 import { InvoicesTableSkeleton } from '@/app/ui/skeletons';
 import { Suspense } from 'react';
 import { fetchInvoicesPages } from '@/app/lib/data';
- 
+import { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: '송장 페이지'
+}
+  
+
 export default async function Page(props: {
   // 아래 코드의 선언부는 Next.js의 서버 컴포넌트에서 사용하는 패턴 중 하나
   searchParams?: Promise<{ // searchParams가 있을 수도 없을 수도 있음 / 이 프로퍼티는 Promise 객체이므로 즉 실제 값은 나중에(resolve) 받아지며 비동기적(async)으로 처리됨
@@ -15,8 +21,6 @@ export default async function Page(props: {
     page?: string; // URL에 포함된 페이지 번호를 나타내며 문자열 형태로 전달됨
   }>
   
-  
-
 }) {
   // props로 전달된 searchParams를 기다려서 값을 추출함 (promise가 resolve될 때까지 기다림)
   const searchParams = await props.searchParams; // (이 값은 Promise로 전달되므로 await 키워드를 사용해 값을 얻음)
